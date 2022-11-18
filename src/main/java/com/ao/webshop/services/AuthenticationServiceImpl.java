@@ -1,26 +1,41 @@
 package com.ao.webshop.services;
 
+import com.ao.webshop.exceptions.WebshopException;
+import com.ao.webshop.models.AppUser;
+import com.ao.webshop.models.dto.LoginUserDTO;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
-
-    @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
+    UserService userService;
 
     @Override
-    public String getToken(UserDetails userDetails) {
+    public void verifyPassword(LoginUserDTO loginuserDTO) {
+        String username = loginuserDTO.getUsername();
+        String password = loginuserDTO.getPassword();
+        AppUser user = userService.getUserByUsername(username);
+        if (user == null || !this.passwordIsCorrect(password, user.getPassword())) {
+            throw new WebshopException(HttpStatus.NOT_FOUND,  "/api/auth/login", "Invalid Username or Password.");
+            //HttpStatus.valueOf(404)
+        }
+    }
+
+    @Override
+    public String generateToken(UserDetails userDetails) {
         Dotenv dotenv = Dotenv.load();
         Algorithm algorithm =
                 Algorithm.HMAC512(
@@ -29,7 +44,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return JWT.create()
                 .withSubject(userDetails.getUsername())
                 .withExpiresAt(new Date(milliseconds))
-                .withIssuer(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/auth/login").toString())
+                .withIssuer(("/api/auth/login"))
                 .withClaim(
                         "roles",
                         userDetails.getAuthorities().stream()
