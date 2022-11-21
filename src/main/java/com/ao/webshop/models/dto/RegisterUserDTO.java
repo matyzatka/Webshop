@@ -10,20 +10,15 @@ import javax.validation.constraints.NotNull;
 @Data
 @Getter
 @Setter
-public class RegisterUserDTO implements Dto{
-    @NotBlank
-    @NotNull
-    private String username;
-    @NotBlank
-    @NotNull
-    private String password;
-    @NotBlank
-    @NotNull
-    private String name;
+public class RegisterUserDTO implements Dto {
 
-    public RegisterUserDTO(String username, String password, String name) {
-        this.username = username;
-        this.password = password;
-        this.name = name;
-    }
+  @NotBlank @NotNull private String username;
+  @NotBlank @NotNull private String password;
+  @NotBlank @NotNull private String name;
+
+  public RegisterUserDTO(String username, String password, String name) {
+    this.username = username;
+    this.password = password;
+    this.name = name;
+  }
 }

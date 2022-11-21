@@ -17,28 +17,28 @@ import java.util.List;
 @Configuration
 public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-        @Override
-        protected void handle(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
-                throws IOException {
-            String targetUrl = determineTargetUrl(authentication);
-            if(response.isCommitted()) return;
-            RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
-            redirectStrategy.sendRedirect(request, response, targetUrl);
-        }
+  @Override
+  protected void handle(
+      HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+      throws IOException {
+    String targetUrl = determineTargetUrl(authentication);
+    if (response.isCommitted()) return;
+    RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+    redirectStrategy.sendRedirect(request, response, targetUrl);
+  }
 
-        protected String determineTargetUrl(Authentication authentication){
-            String url = "/login?error=true";
-            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-            List<String> roles = new ArrayList<String>();
-            for(GrantedAuthority a : authorities){
-                roles.add(a.getAuthority());
-            }
-            if(roles.contains("ROLE_ADMIN")){
-                url = "/admin/dashboard";
-            }else if(roles.contains("ROLE_USER")) {
-                url = "/dashboard";
-            }
-            return url;
-        }
+  protected String determineTargetUrl(Authentication authentication) {
+    String url = "/login?error=true";
+    Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+    List<String> roles = new ArrayList<>();
+    for (GrantedAuthority a : authorities) {
+      roles.add(a.getAuthority());
     }
-
+    if (roles.contains("ROLE_ADMIN")) {
+      url = "/admin/dashboard";
+    } else if (roles.contains("ROLE_USER")) {
+      url = "/dashboard";
+    }
+    return url;
+  }
+}

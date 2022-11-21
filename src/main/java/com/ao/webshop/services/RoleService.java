@@ -5,5 +5,5 @@ import com.ao.webshop.models.Role;
 import javax.servlet.http.HttpServletRequest;
 
 public interface RoleService {
-    Role saveRole(Role role, HttpServletRequest... request);
+  Role saveRole(Role role, HttpServletRequest... request);
 }
